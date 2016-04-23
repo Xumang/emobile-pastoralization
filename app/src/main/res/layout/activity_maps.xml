@@ -1,0 +1,63 @@
+<LinearLayout android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/editlatt"
+            android:layout_width="200dp"
+            android:layout_height="40dp"
+            android:layout_gravity="left"
+            android:inputType="none" />
+
+        <Button
+            android:id="@+id/bsearch"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/search"
+
+            android:onClick="onSearch" />
+
+    </LinearLayout>
+<!--<LinearLayout-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:orientation="horizontal"-->
+    <!--android:layout_weight="1">-->
+
+    <!--<Button-->
+        <!--android:id="@+id/bsat"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Satellite"-->
+        <!--android:onClick="onSat"/>-->
+
+    <!--<Button-->
+        <!--android:id="@+id/bter"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="terrain"-->
+        <!--android:onClick="onTer"/>-->
+
+<!--</LinearLayout>-->
+
+     <LinearLayout
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_weight="9">
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:context="com.sumang.mapsgoogle.MapsActivity" />
+     </LinearLayout>
+</LinearLayout>
+
