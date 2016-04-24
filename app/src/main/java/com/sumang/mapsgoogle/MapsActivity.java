@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.android.gms.identity.intents.Address;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -56,7 +57,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         ImageView icon = new ImageView(this); // Create an icon
-        icon.setImageResource(R.mipmap.ic_launcher);
+        icon.setImageResource(R.mipmap.eye);
 
         FloatingActionButton actionButton = new FloatingActionButton.Builder(this)
                 .setContentView(icon)
@@ -64,16 +65,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         ImageView itemIcon1 = new ImageView(this);
-        itemIcon1.setImageResource(R.mipmap.ic_launcher);
+        itemIcon1.setImageResource(R.mipmap.hybmap);
 
         ImageView itemIcon2 = new ImageView(this);
-        itemIcon2.setImageResource(R.mipmap.ic_launcher);
+        itemIcon2.setImageResource(R.mipmap.satimg);
 
         ImageView itemIcon3 = new ImageView(this);
-        itemIcon3.setImageResource(R.mipmap.ic_launcher);
+        itemIcon3.setImageResource(R.mipmap.terrmap);
 
         ImageView itemIcon4 = new ImageView(this);
-        itemIcon4.setImageResource(R.mipmap.ic_launcher);
+        itemIcon4.setImageResource(R.mipmap.normap);
 
         SubActionButton.Builder itemBuilder = new SubActionButton.Builder(this);
 
@@ -189,43 +190,50 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //                .title("Melbourne"));
 //        melbourne.showInfoWindow();
 
-        Circle circle = mMap.addCircle(new CircleOptions()
-                .center(new LatLng(27.749986, 85.261760))
-                .radius(1000)
-                .strokeColor(Color.GREEN)
-                .fillColor(Color.GREEN)
-                );
+
 
 // Instantiates a new Polygon object and adds points to define a rectangle
         PolygonOptions rectOptions = new PolygonOptions()
-                .add(new LatLng(37.35, -122.0),
-                        new LatLng(37.45, -122.0),
-                        new LatLng(37.45, -122.2),
-                        new LatLng(37.35, -122.2),
-                        new LatLng(37.35, -122.0))
-                .fillColor(Color.GREEN);
+                .add(new LatLng(27.769126, 85.268626),
+                        new LatLng(27.773476, 85.255464),
+                        new LatLng(27.762188, 85.245379),
+                        new LatLng(27.757194, 85.235981),
+                        new LatLng(27.750918, 85.218607),
+                        new LatLng(27.728072, 85.276822),
+                        new LatLng(27.735364, 85.301262))
+                .fillColor(0x4F00FF00)
+                .strokeColor(0x2F00FF00);
+//        polygon.setFillColor(0x7F00FF00);
 
 // Get back the mutable Polygon
         Polygon polygon = mMap.addPolygon(rectOptions);
+
+
+
+
 
     }
 
     @Override
     public void onClick(View v) {
-            if(v.getTag().equals(TAG_HYB)){
+            if(v.getTag().equals(TAG_HYB)) {
                 mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                Toast.makeText(getApplicationContext(), "HYBRID MAP", Toast.LENGTH_SHORT).show();
             }
 
         if(v.getTag().equals(TAG_SAT)){
                 mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+            Toast.makeText(getApplicationContext(), "SATELLITE MAP", Toast.LENGTH_SHORT).show();
         }
 
         if(v.getTag().equals(TAG_TER)){
                 mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+            Toast.makeText(getApplicationContext(), "TERRAIN MAP", Toast.LENGTH_SHORT).show();
         }
 
         if(v.getTag().equals(TAG_NOR)){
             mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+            Toast.makeText(getApplicationContext(), "NORMAL MAP", Toast.LENGTH_SHORT).show();
         }
 
 
