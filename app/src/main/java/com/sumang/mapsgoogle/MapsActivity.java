@@ -67,10 +67,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Spinner spinner;
 
     JSONArray features = null;
-  //  String url = "http://nepal.piensa.co/data/helipads.json";
-    //String url = "http://nepal.piensa.co/data/medical_point.json";
-    String url = "http://nepal.piensa.co/data/village_green.json";
-
+    //String url = "http://nepal.piensa.co/data/village_green.json";
+    String url = "http://nepal.piensa.co/data/riverbanks.json";
+    //String url = "http://nepal.piensa.co/data/lakes.json";
+    //String url = "http://nepal.piensa.co/data/tracks.json";
+    //String url = "http://nepal.piensa.co/data/farms.json";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -174,44 +175,85 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         protected void onPostExecute(org.json.JSONObject json) {
             JSONObject feature = null;
+            String title = url.split("/")[4].replace(".json", "").replace("_", " ");
+            ArrayList<Double> lats = new ArrayList<>();
+            ArrayList<Double> lngs = new ArrayList<>();
             JSONArray coordinates = null, coordinatesArray = null;
             JSONObject geometry = null;
             String type = null;
             System.out.println("json inside post  " + json);
             Double lat = 0.00, lng = 0.00;
+
+            double lon = 85.314288;
+            double latt = 27.726360;
+            double R = 6371;  // earth radius in km
+
+            double radius = 50; // km
+
+            double x1 = lon - Math.toDegrees(radius/R/Math.cos(Math.toRadians(lat)));
+
+            double x2 = lon + Math.toDegrees(radius/R/Math.cos(Math.toRadians(lat)));
+
+            double y1 = latt + Math.toDegrees(radius/R);
+
+            double y2 = latt - Math.toDegrees(radius/R);
+
             try {
                 // Getting JSON Array
-                features = json.getJSONArray("features");
-                for (int i = 0; i < features.length(); i++) {
-                    feature = features.getJSONObject(i);
-                    geometry = (JSONObject) feature.get("geometry");
-                    type = geometry.getString("type");
-                    coordinates = (JSONArray) geometry.get("coordinates");
-                    switch (type) {
-                        case "Point":
-                            lng = coordinates.getDouble(0);
-                            lat = coordinates.getDouble(1);
-                            LatLng latLng = new LatLng(lat, lng);
-                            mMap.addMarker(new MarkerOptions().position(latLng).title("Rani Pokhari").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
-                            System.out.println("point lat,long  " + lat + "," + lng);
-                            break;
-                        case "Polygon":
-                            PolygonOptions rectOptions = null;
-                            ArrayList<LatLng> val = new ArrayList<>();
-                            coordinatesArray = coordinates.getJSONArray(0);
-                            for (int j = 0; j < coordinatesArray.length(); j++) {
-                                lng = coordinatesArray.getJSONArray(j).getDouble(0);
-                                lat = coordinatesArray.getJSONArray(j).getDouble(1);
-                                System.out.println("polygon lat,long  " + lat + "," + lng);
-                                val.add(new LatLng(lat, lng));
-                            }
-                            rectOptions = new PolygonOptions().addAll(val).fillColor(Color.RED);
-                            Polygon polygon = mMap.addPolygon(rectOptions);
-                            break;
+                if (json != null) {
+                    features = json.getJSONArray("features");
+                    for (int i = 0; i < features.length(); i++) {
+                        feature = features.getJSONObject(i);
+                        geometry = (JSONObject) feature.get("geometry");
+                        type = geometry.getString("type");
+                        coordinates = (JSONArray) geometry.get("coordinates");
+                        switch (type) {
+                            case "Point":
+                                lng = coordinates.getDouble(0);
+                                lat = coordinates.getDouble(1);
+                                LatLng latLng = new LatLng(lat, lng);
+                                mMap.addMarker(new MarkerOptions().position(latLng).title(title).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+                                System.out.println("point lat,long  " + lat + "," + lng);
+                                break;
+                            case "Polygon":
+                                PolygonOptions rectOptions = null;
+                                ArrayList<LatLng> val = new ArrayList<>();
+                                lats = new ArrayList<>();
+                                lngs = new ArrayList<>();
+                                coordinatesArray = coordinates.getJSONArray(0);
+                                for (int j = 0; j < coordinatesArray.length(); j++) {
+                                    lng = coordinatesArray.getJSONArray(j).getDouble(0);
+                                    lat = coordinatesArray.getJSONArray(j).getDouble(1);
+                                    System.out.println("lat = " + lng);
+                                    System.out.println("x1 = " + x1);
+                                    System.out.println("x2 = " + x2);
 
-                        case "default":
-                            System.out.println(" miss match type " + type);
-                            break;
+                                    System.out.println("lat = " + lat);
+                                    System.out.println("y1 = " + y1);
+                                    System.out.println("y2 = " + y2);
+                                    if((x1<=lng && lng<=x2) && (y2<=lat && lat<=y1)){
+                                        System.out.println("polygon lat,long  " + lat + "," + lng);
+                                        val.add(new LatLng(lat, lng));
+                                        lats.add(lat);
+                                        lngs.add(lng);
+                                    }
+
+                                }
+                                if(val.size()>0) {
+                                    Double area = area(lats, lngs);
+                                    System.out.println("area111111 = " + area);
+                                    rectOptions = new PolygonOptions().addAll(val).fillColor(0x4F00FF00)
+                                            .strokeColor(0x2F00FF00);
+                                    Polygon polygon = mMap.addPolygon(rectOptions);
+                                    System.out.println("title =111111 " + title);
+                                    mMap.addMarker(new MarkerOptions().position(new LatLng(lats.get(0), lngs.get(0))).title(title).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))).setSnippet("area is " + area.toString() + " sq Ft");
+                                }
+                                break;
+
+                            case "default":
+                                System.out.println(" miss match type " + type);
+                                break;
+                        }
                     }
                 }
 
@@ -257,7 +299,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Geocoder geocoder = new Geocoder(this);
             try {
                 addressList = geocoder.getFromLocationName(location, 1);
-                if(addressList.size()>0) {
+                if (addressList.size() > 0) {
                     android.location.Address address = addressList.get(0);
                     LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
                     mMap.addMarker(new MarkerOptions().position(latLng).title(" your Location"));
@@ -357,5 +399,43 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
 
+    }
+    private double area(ArrayList<Double> lats,ArrayList<Double> lons)
+    {
+        double sum=0;
+        double prevcolat=0;
+        double prevaz=0;
+        double colat0=0;
+        double az0=0;
+        for (int i=0;i<lats.size();i++)
+        {
+            double colat=2*Math.atan2(Math.sqrt(Math.pow(Math.sin(lats.get(i)*Math.PI/180/2), 2)+ Math.cos(lats.get(i)*Math.PI/180)*Math.pow(Math.sin(lons.get(i)*Math.PI/180/2), 2)),Math.sqrt(1-  Math.pow(Math.sin(lats.get(i)*Math.PI/180/2), 2)- Math.cos(lats.get(i)*Math.PI/180)*Math.pow(Math.sin(lons.get(i)*Math.PI/180/2), 2)));
+            double az=0;
+            if (lats.get(i)>=90)
+            {
+                az=0;
+            }
+            else if (lats.get(i)<=-90)
+            {
+                az=Math.PI;
+            }
+            else
+            {
+                az=Math.atan2(Math.cos(lats.get(i)*Math.PI/180) * Math.sin(lons.get(i)*Math.PI/180),Math.sin(lats.get(i)*Math.PI/180))% (2*Math.PI);
+            }
+            if(i==0)
+            {
+                colat0=colat;
+                az0=az;
+            }
+            if(i>0 && i<lats.size())
+            {
+                sum=sum+(1-Math.cos(prevcolat  + (colat-prevcolat)/2))*Math.PI*((Math.abs(az-prevaz)/Math.PI)-2*Math.ceil(((Math.abs(az-prevaz)/Math.PI)-1)/2))* Math.signum(az-prevaz);
+            }
+            prevcolat=colat;
+            prevaz=az;
+        }
+        sum=sum+(1-Math.cos(prevcolat  + (colat0-prevcolat)/2))*(az0-prevaz);
+        return 5.10072E14* Math.min(Math.abs(sum)/4/Math.PI,1-Math.abs(sum)/4/Math.PI);
     }
 }
