@@ -65,7 +65,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     JSONArray features = null;
   //  String url = "http://nepal.piensa.co/data/helipads.json";
-    String url = "http://nepal.piensa.co/data/medical_point.json";
+    //String url = "http://nepal.piensa.co/data/medical_point.json";
+    String url = "http://nepal.piensa.co/data/village_green.json";
 
 
     @Override
@@ -237,15 +238,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Geocoder geocoder = new Geocoder(this);
             try {
                 addressList = geocoder.getFromLocationName(location, 1);
+                if(addressList.size()>0) {
+                    android.location.Address address = addressList.get(0);
+                    LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                    mMap.addMarker(new MarkerOptions().position(latLng).title(" your Location"));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+                }
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            android.location.Address address = addressList.get(0);
-            LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(latLng).title(" your Location"));
-            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+
 
         }
 
