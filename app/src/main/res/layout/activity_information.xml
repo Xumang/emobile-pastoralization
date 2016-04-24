@@ -7,15 +7,53 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.sumang.mapsgoogle.Information">
+    tools:context="com.sumang.mapsgoogle.Information"
+    android:background="@mipmap/earthgree"
+
+    android:layout_gravity="center_horizontal"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="LEADING YOUR"
+        android:textSize="40sp"
+        android:textColor="#ffffff"
+        android:paddingBottom="15dp"
+        android:id="@+id/textView4" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="WAY"
+        android:textSize="40sp"
+        android:textColor="#ffffff"
+        android:id="@+id/textView5"
+        android:paddingBottom="100dp"
+        android:layout_gravity="center_horizontal" />
+
+    <Button
+        android:layout_marginTop="60dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="LET'S BEGIN"
+        android:padding="10dp"
+        android:id="@+id/button"
+        android:background="#53a89d"
+        android:textColor="#ffffff"
+        android:layout_gravity="center_horizontal"
+        android:onClick="abc"
+        android:layout_marginBottom="20dp"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Maps"
-        android:gravity="center"
-        android:id="@+id/button"
-        android:layout_gravity="center"
-        />
-
+        android:text="INFO"
+        android:padding="10dp"
+        android:id="@+id/info"
+        android:background="#53a89d"
+        android:textColor="#ffffff"
+        android:layout_gravity="center_horizontal"
+        android:onClick="abc1"/>
 </LinearLayout>

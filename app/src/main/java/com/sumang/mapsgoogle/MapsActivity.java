@@ -10,8 +10,11 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 // new imports
@@ -54,14 +57,14 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, View.OnClickListener {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     private GoogleMap mMap;
     private static final String TAG_SAT = "Satellite";
     private static final String TAG_HYB = "Hybrid";
     private static final String TAG_TER = "Terrain";
     private static final String TAG_NOR = "Normal";
-
+    Spinner spinner;
 
     JSONArray features = null;
   //  String url = "http://nepal.piensa.co/data/helipads.json";
@@ -78,7 +81,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        //For Spinner
+        spinner = (Spinner)findViewById(R.id.spinnerid);
+        spinner.setOnItemSelectedListener(this);
 
+        ArrayAdapter adapter = ArrayAdapter.createFromResource(this,R.array.Resources,android.R.layout.simple_spinner_item);
+        spinner.setAdapter(adapter);
+        // for fab button
         ImageView icon = new ImageView(this); // Create an icon
         icon.setImageResource(R.mipmap.eye);
 
@@ -126,6 +135,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 // ...
                 .attachTo(actionButton)
                 .build();
+
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
 
     }
 
@@ -284,13 +303,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //        googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
 //        googleMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
 //        googleMap.getUiSettings().setZoomGesturesEnabled(true);
-        mMap.addMarker(new MarkerOptions().position(new LatLng(27.707845, 85.314689)).title("Rani Pokhari").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
-        mMap.addMarker(new MarkerOptions().position(new LatLng(27.749986, 85.261760)).title("Chhatre Deurali").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).snippet("Grazing Land"));
-//        final LatLng MELBOURNE = new LatLng(27.749986, 85.261760);
-//        Marker melbourne = mMap.addMarker(new MarkerOptions()
-//                .position(MELBOURNE)
-//                .title("Melbourne"));
-//        melbourne.showInfoWindow();
+//        mMap.addMarker(new MarkerOptions().position(new LatLng(27.707845, 85.314689)).title("Rani Pokhari").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+//        mMap.addMarker(new MarkerOptions().position(new LatLng(27.749986, 85.261760)).title("Chhatre Deurali").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).snippet("Grazing Land"));
+        final LatLng KATHMANDU = new LatLng(27.749986, 85.261760);
+        Marker kathmandu = mMap.addMarker(new MarkerOptions()
+                .position(KATHMANDU)
+                .title("Kathmandu"));
+//        kathmandu.showInfoWindow();
+
 
 
 
@@ -309,8 +329,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 // Get back the mutable Polygon
         Polygon polygon = mMap.addPolygon(rectOptions);
-
-
 
 
 

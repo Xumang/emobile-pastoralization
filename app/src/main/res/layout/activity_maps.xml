@@ -6,22 +6,36 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:background="#53a89d">
 
         <EditText
             android:id="@+id/editlatt"
-            android:layout_width="200dp"
+            android:layout_width="150dp"
             android:layout_height="40dp"
             android:layout_gravity="left"
-            android:inputType="none" />
+            android:inputType="none"
+            android:textColor="#000000"
+            android:layout_weight="5"/>
 
         <Button
             android:id="@+id/bsearch"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="@string/search"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@mipmap/searchicon"
+            android:onClick="onSearch"
+            android:layout_weight=".7"/>
 
-            android:onClick="onSearch" />
+        <Spinner
+            android:id="@+id/spinnerid"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_weight="4"
+            >
+
+
+
+        </Spinner>
 
     </LinearLayout>
 <!--<LinearLayout-->
