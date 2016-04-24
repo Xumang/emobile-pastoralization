@@ -13,6 +13,19 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+// new imports
+
+import java.io.InputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.HttpURLConnection;
+
+import com.sumang.mapsgoogle.helpers.JSONParser;
+
+// new imports ends here
+
+
 import com.google.android.gms.identity.intents.Address;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -31,12 +44,16 @@ import com.oguzdev.circularfloatingactionmenu.library.FloatingActionButton;
 import com.oguzdev.circularfloatingactionmenu.library.FloatingActionMenu;
 import com.oguzdev.circularfloatingactionmenu.library.SubActionButton;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, View.OnClickListener{
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, View.OnClickListener {
 
     private GoogleMap mMap;
     private static final String TAG_SAT = "Satellite";
@@ -45,6 +62,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final String TAG_NOR = "Normal";
 
 
+    JSONArray features = null;
+  //  String url = "http://nepal.piensa.co/data/helipads.json";
+    String url = "http://nepal.piensa.co/data/medical_point.json";
 
 
     @Override
@@ -64,6 +84,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .setContentView(icon)
                 .build();
 
+        new JSONParse().execute();
 
         ImageView itemIcon1 = new ImageView(this);
         itemIcon1.setImageResource(R.mipmap.ic_launcher);
@@ -106,6 +127,84 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
+    // async task class starts here >>>>>>>>>>>>>>
+
+    private class JSONParse extends android.os.AsyncTask<String, String, org.json.JSONObject> {
+        private android.app.ProgressDialog pDialog;
+
+        @Override
+        protected void onPreExecute() {
+            System.out.println("inside pre execute");
+            // titleImage = (android.widget.ImageView) findViewById(pas.pranav.uniglobecollege.R.id.ivTitleImage);
+            //super.onPreExecute();
+        }
+
+        @Override
+        protected org.json.JSONObject doInBackground(String... args) {
+            JSONParser jParser = new JSONParser();
+
+            // Getting JSON from URL
+            org.json.JSONObject json = jParser.getJSONFromUrl(url);
+            System.out.println("inside background");
+            System.out.println("json contents : " + json);
+            return json;
+        }
+
+        @Override
+        protected void onPostExecute(org.json.JSONObject json) {
+            JSONObject feature = null;
+            JSONArray coordinates = null, coordinatesArray = null;
+            JSONObject geometry = null;
+            String type = null;
+            System.out.println("json inside post  " + json);
+            Double lat = 0.00, lng = 0.00;
+            try {
+                // Getting JSON Array
+                features = json.getJSONArray("features");
+                for (int i = 0; i < features.length(); i++) {
+                    feature = features.getJSONObject(i);
+                    geometry = (JSONObject) feature.get("geometry");
+                    type = geometry.getString("type");
+                    coordinates = (JSONArray) geometry.get("coordinates");
+                    switch (type) {
+                        case "Point":
+                            lng = coordinates.getDouble(0);
+                            lat = coordinates.getDouble(1);
+                            LatLng latLng = new LatLng(lat, lng);
+                            mMap.addMarker(new MarkerOptions().position(latLng).title("Rani Pokhari").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+                            System.out.println("point lat,long  " + lat + "," + lng);
+                            break;
+                        case "Polygon":
+                            PolygonOptions rectOptions = null;
+                            ArrayList<LatLng> val = new ArrayList<>();
+                            coordinatesArray = coordinates.getJSONArray(0);
+                            for (int j = 0; j < coordinatesArray.length(); j++) {
+                                lng = coordinatesArray.getJSONArray(j).getDouble(0);
+                                lat = coordinatesArray.getJSONArray(j).getDouble(1);
+                                System.out.println("polygon lat,long  " + lat + "," + lng);
+                                val.add(new LatLng(lat, lng));
+                            }
+                            rectOptions = new PolygonOptions().addAll(val).fillColor(Color.RED);
+                            Polygon polygon = mMap.addPolygon(rectOptions);
+                            break;
+
+                        case "default":
+                            System.out.println(" miss match type " + type);
+                            break;
+                    }
+                }
+
+            } catch (org.json.JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+    }
+
+
+    // <<<<<<<<<<<<<<<<<<< async task ends here
+
 
     /**
      * Manipulates the map once available.
@@ -128,25 +227,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //
 //     mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
 //    }
-
-
-    public void onSearch(View view){
-        EditText location_sg= (EditText) findViewById(R.id.editlatt);
+    public void onSearch(View view) {
+        EditText location_sg = (EditText) findViewById(R.id.editlatt);
         String location = location_sg.getText().toString();
-        List<android.location.Address> addressList= null;
+        List<android.location.Address> addressList = null;
 
-        if (location !=null || !location.equals(""))
-        {
+        if (location != null || !location.equals("")) {
             Geocoder geocoder = new Geocoder(this);
             try {
-             addressList = geocoder.getFromLocationName(location , 1);
+                addressList = geocoder.getFromLocationName(location, 1);
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
             android.location.Address address = addressList.get(0);
-            LatLng latLng = new LatLng(address.getLatitude() , address.getLongitude());
+            LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
             mMap.addMarker(new MarkerOptions().position(latLng).title(" your Location"));
             mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
 
@@ -184,7 +280,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //        googleMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
 //        googleMap.getUiSettings().setZoomGesturesEnabled(true);
         mMap.addMarker(new MarkerOptions().position(new LatLng(27.707845, 85.314689)).title("Rani Pokhari").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
-        mMap.addMarker(new MarkerOptions().position(new LatLng( 27.749986, 85.261760)).title("Chhatre Deurali").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).snippet("Grazing Land"));
+        mMap.addMarker(new MarkerOptions().position(new LatLng(27.749986, 85.261760)).title("Chhatre Deurali").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).snippet("Grazing Land"));
 //        final LatLng MELBOURNE = new LatLng(27.749986, 85.261760);
 //        Marker melbourne = mMap.addMarker(new MarkerOptions()
 //                .position(MELBOURNE)
@@ -196,16 +292,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .radius(1000)
                 .strokeColor(Color.GREEN)
                 .fillColor(Color.GREEN)
-                );
+        );
 
 // Instantiates a new Polygon object and adds points to define a rectangle
-        PolygonOptions rectOptions = new PolygonOptions()
-                .add(new LatLng(37.35, -122.0),
-                        new LatLng(37.45, -122.0),
-                        new LatLng(37.45, -122.2),
-                        new LatLng(37.35, -122.2),
-                        new LatLng(37.35, -122.0))
-                .fillColor(Color.GREEN);
+        ArrayList<LatLng> val = new ArrayList<>();
+        val.add(new LatLng(37.35, -122.0));
+        val.add(new LatLng(37.45, -122.0));
+        val.add(new LatLng(37.45, -122.2));
+        val.add(new LatLng(37.35, -122.2));
+        val.add(new LatLng(37.35, -122.0));
+        PolygonOptions rectOptions = new PolygonOptions().addAll(val).fillColor(Color.RED);
 
 // Get back the mutable Polygon
         Polygon polygon = mMap.addPolygon(rectOptions);
@@ -214,19 +310,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onClick(View v) {
-            if(v.getTag().equals(TAG_HYB)){
-                mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-            }
-
-        if(v.getTag().equals(TAG_SAT)){
-                mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+        if (v.getTag().equals(TAG_HYB)) {
+            mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         }
 
-        if(v.getTag().equals(TAG_TER)){
-                mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+        if (v.getTag().equals(TAG_SAT)) {
+            mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
         }
 
-        if(v.getTag().equals(TAG_NOR)){
+        if (v.getTag().equals(TAG_TER)) {
+            mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+        }
+
+        if (v.getTag().equals(TAG_NOR)) {
             mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         }
 
