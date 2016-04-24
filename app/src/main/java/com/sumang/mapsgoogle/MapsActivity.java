@@ -25,6 +25,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.HttpURLConnection;
 
+import com.google.android.gms.maps.model.CameraPosition;
 import com.sumang.mapsgoogle.helpers.JSONParser;
 
 // new imports ends here
@@ -64,14 +65,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final String TAG_HYB = "Hybrid";
     private static final String TAG_TER = "Terrain";
     private static final String TAG_NOR = "Normal";
+    String url = null;
+    Double distance = 10.0;
     Spinner spinner;
 
     JSONArray features = null;
-    //String url = "http://nepal.piensa.co/data/village_green.json";
-    String url = "http://nepal.piensa.co/data/riverbanks.json";
-    //String url = "http://nepal.piensa.co/data/lakes.json";
-    //String url = "http://nepal.piensa.co/data/tracks.json";
-    //String url = "http://nepal.piensa.co/data/farms.json";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +94,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .setContentView(icon)
                 .build();
 
-        new JSONParse().execute();
 
         ImageView itemIcon1 = new ImageView(this);
         itemIcon1.setImageResource(R.mipmap.hybmap);
@@ -141,6 +138,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        if(position == 0){
+            url = "http://nepal.piensa.co/data/village_green.json";
+            mMap.clear();
+        }
+        if(position == 1){
+            url = "http://nepal.piensa.co/data/riverbanks.json";
+            mMap.clear();
+        }
+        if(position == 2){
+            url = "http://nepal.piensa.co/data/medical_point.json";
+            mMap.clear();
+        }
+        new JSONParse().execute();
+        //String url = ;
+        //String url = "http://nepal.piensa.co/data/riverbanks.json";
+        //String url = "http://nepal.piensa.co/data/lakes.json";
+        //String url = "http://nepal.piensa.co/data/tracks.json";
+        //String url = "http://nepal.piensa.co/data/farms.json";
 
     }
 
@@ -188,7 +203,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             double latt = 27.726360;
             double R = 6371;  // earth radius in km
 
-            double radius = 50; // km
+            double radius = distance;//50; // km
 
             double x1 = lon - Math.toDegrees(radius/R/Math.cos(Math.toRadians(lat)));
 
@@ -328,6 +343,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
 //        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(new LatLng(27.692122, 85.319822))      // Sets the center of the map to location user
+                .zoom(12)                   // Sets the zoom
+                .bearing(0)                // Sets the orientation of the camera to east
+                .tilt(0)                   // Sets the tilt of the camera to 30 degrees
+                .build();                   // Creates a CameraPosition from the builder
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
 //        mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
@@ -340,6 +363,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return;
         }
         mMap.setMyLocationEnabled(true);
+
         googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 //        googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
 //        googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
@@ -347,30 +371,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //        googleMap.getUiSettings().setZoomGesturesEnabled(true);
 //        mMap.addMarker(new MarkerOptions().position(new LatLng(27.707845, 85.314689)).title("Rani Pokhari").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
 //        mMap.addMarker(new MarkerOptions().position(new LatLng(27.749986, 85.261760)).title("Chhatre Deurali").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).snippet("Grazing Land"));
-        final LatLng KATHMANDU = new LatLng(27.749986, 85.261760);
-        Marker kathmandu = mMap.addMarker(new MarkerOptions()
-                .position(KATHMANDU)
-                .title("Kathmandu"));
+//        final LatLng KATHMANDU = new LatLng(27.749986, 85.261760);
+//        Marker kathmandu = mMap.addMarker(new MarkerOptions()
+//                .position(KATHMANDU)
+//                .title("Kathmandu"));
 //        kathmandu.showInfoWindow();
 
 
 
 
 // Instantiates a new Polygon object and adds points to define a rectangle
-        PolygonOptions rectOptions = new PolygonOptions()
-                .add(new LatLng(27.769126, 85.268626),
-                        new LatLng(27.773476, 85.255464),
-                        new LatLng(27.762188, 85.245379),
-                        new LatLng(27.757194, 85.235981),
-                        new LatLng(27.750918, 85.218607),
-                        new LatLng(27.728072, 85.276822),
-                        new LatLng(27.735364, 85.301262))
-                .fillColor(0x4F00FF00)
-                .strokeColor(0x2F00FF00);
-//        polygon.setFillColor(0x7F00FF00);
-
-// Get back the mutable Polygon
-        Polygon polygon = mMap.addPolygon(rectOptions);
+//        PolygonOptions rectOptions = new PolygonOptions()
+//                .add(new LatLng(27.769126, 85.268626),
+//                        new LatLng(27.773476, 85.255464),
+//                        new LatLng(27.762188, 85.245379),
+//                        new LatLng(27.757194, 85.235981),
+//                        new LatLng(27.750918, 85.218607),
+//                        new LatLng(27.728072, 85.276822),
+//                        new LatLng(27.735364, 85.301262))
+//                .fillColor(0x4F00FF00)
+//                .strokeColor(0x2F00FF00);
+////        polygon.setFillColor(0x7F00FF00);
+//
+//// Get back the mutable Polygon
+//        Polygon polygon = mMap.addPolygon(rectOptions);
 
 
 
